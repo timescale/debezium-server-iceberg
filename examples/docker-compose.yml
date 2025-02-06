@@ -1,14 +1,14 @@
 services:
-  debezium-iceberg:
+  debezium:
     image: ghcr.io/memiiso/debezium-server-iceberg:latest
-    container_name: debezium-server-iceberg
+    container_name: iceberg-dbz
     networks:
       iceberg_net:
     depends_on:
       # - jdbccatalog
       - rest
       - minio
-      - postgresqlsourcedb
+      - tsdb
       - mc
     volumes:
       - ./conf/application.properties:/app/conf/application.properties
@@ -17,11 +17,11 @@ services:
       - AWS_SECRET_ACCESS_KEY=password
       - AWS_REGION=us-east-1
 
-  # TODO: cut this over to a modern version of debezium, and also cut over to TimescaleDB.
-  postgresqlsourcedb:
-    image: debezium/example-postgres:3.0.0.Final
-    # image: debezium/example-postgres:3.0.0.Final # Using this for TSDB HT support.
-    container_name: postgresql-source-db
+  tsdb:
+    image: ts2pg17-dbz3:latest
+    build:
+      dockerfile: Dockerfile.Timescale
+    container_name: iceberg-tsdb
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -50,7 +50,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: minio
+    container_name: iceberg-minio
     environment:
       - MINIO_ROOT_USER=admin
       - MINIO_ROOT_PASSWORD=password
@@ -68,7 +68,7 @@ services:
     depends_on:
       - minio
     image: minio/mc
-    container_name: mc
+    container_name: iceberg-minio-mc
     networks:
       iceberg_net:
     environment:
@@ -87,7 +87,7 @@ services:
   # Spark is added here specifically to facilitate easy spark-sql verification of Iceberg data.
   spark-iceberg:
     image: tabulario/spark-iceberg
-    container_name: spark-iceberg
+    container_name: iceberg-spark
     build: spark/
     networks:
       iceberg_net:
