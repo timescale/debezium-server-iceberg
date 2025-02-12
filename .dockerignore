@@ -1,6 +1,7 @@
 Dockerfile
 **/target/
 
+appdist
 .idea/
 .github/
 .run/

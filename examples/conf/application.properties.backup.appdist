@@ -1,3 +1,5 @@
+aws.region=us-east-1
+
 # Use iceberg sink
 debezium.sink.type=iceberg
 
@@ -8,6 +10,7 @@ debezium.sink.iceberg.upsert-keep-deletes=true
 debezium.sink.iceberg.write.format.default=parquet
 
 # S3 config using JdbcCatalog catalog And S3FileIO
+debezium.sink.iceberg.catalog=org.apache.iceberg.spark.SparkCatalog
 debezium.sink.iceberg.catalog.io-impl=org.apache.iceberg.aws.s3.S3FileIO
 debezium.sink.iceberg.catalog-impl=software.amazon.s3tables.iceberg.S3TablesCatalog
 debezium.sink.iceberg.catalog-name=iceberg
@@ -24,16 +27,16 @@ debezium.sink.iceberg.s3.path-style-access=true
 # debezium.sink.iceberg.s3.access-key-id=ASIASCMEGEOQVOAQLI7Y
 # debezium.sink.iceberg.s3.secret-access-key=TzUEYpLhHfDvIz8Fh+wz10E91sMmZ/5Nx7woxWOR
 
-debezium.sink.batch.batch-size-wait=MaxBatchSizeWait
-debezium.source.max.batch.size=2048
-debezium.source.max.queue.size=16000
-debezium.sink.batch.batch-size-wait.max-wait-ms=30000
-debezium.sink.batch.batch-size-wait.wait-interval-ms=5000
+# debezium.sink.batch.batch-size-wait=MaxBatchSizeWait
+# debezium.source.max.batch.size=2048
+# debezium.source.max.queue.size=16000
+# debezium.sink.batch.batch-size-wait.max-wait-ms=30000
+# debezium.sink.batch.batch-size-wait.wait-interval-ms=5000
 
 # postgres source
 debezium.source.connector.class=io.debezium.connector.postgresql.PostgresConnector
 debezium.source.offset.flush.interval.ms=0
-debezium.source.database.hostname=tsdb
+debezium.source.database.hostname=localhost
 debezium.source.database.port=5432
 debezium.source.database.user=postgres
 debezium.source.database.password=postgres
@@ -67,5 +70,5 @@ debezium.transforms.unwrap.delete.handling.mode=rewrite
 debezium.transforms.unwrap.drop.tombstones=true
 
 # ############ SET LOG LEVELS ############
-quarkus.log.level=INFO
+quarkus.log.level=DEBUG
 quarkus.log.console.json=false

@@ -117,8 +117,7 @@ public class IcebergUtil {
     return icebergCatalog.createTable(tableIdentifier, schema);
   }
 
-  public static Table createIcebergTable(Catalog icebergCatalog, TableIdentifier tableIdentifier,
-                                         Schema schema, String writeFormat) {
+  public static Table createIcebergTable(Catalog icebergCatalog, TableIdentifier tableIdentifier, Schema schema, String writeFormat) {
 
     LOGGER.warn("Creating table:'{}'\nschema:{}\nrowIdentifier:{}", tableIdentifier, schema,
         schema.identifierFieldNames());
