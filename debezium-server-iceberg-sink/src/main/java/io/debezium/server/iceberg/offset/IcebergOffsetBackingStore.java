@@ -86,6 +86,12 @@ public class IcebergOffsetBackingStore extends MemoryOffsetBackingStore implemen
     icebergCatalog = storageConfig.icebergCatalog();
     tableFullName = storageConfig.tableFullName();
     tableId = storageConfig.tableIdentifier();
+    LOG.info("CONFIG DEBUG: tableId={}; tableFullName={}; catalogName={}", tableId, tableFullName, storageConfig.catalogName());
+    for (Map.Entry<String, String> entry : storageConfig.icebergProperties().entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      LOG.info("DEBUG: Key: " + key + ", Value: " + value);
+    }
   }
 
   @Override
@@ -135,6 +141,7 @@ public class IcebergOffsetBackingStore extends MemoryOffsetBackingStore implemen
   }
 
   private void initializeTable() {
+    LOG.info("DEBUGGING---initializeTable: tableId:{}", tableId);
     if (icebergCatalog.tableExists(tableId)) {
       offsetTable = icebergCatalog.loadTable(tableId);
     } else {
