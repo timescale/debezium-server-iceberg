@@ -1,7 +1,7 @@
 services:
   debezium:
     container_name: debezium
-    image: ghcr.io/memiiso/debezium-server-iceberg:latest
+    image: ghcr.io/memiiso/debezium-server-iceberg:local-03
 #    command: sh -c 'sleep infinity'
 #    entrypoint: sh -c 'sleep infinity'
     networks:
@@ -96,17 +96,16 @@ services:
 #    build: spark/
 #    networks:
 #      iceberg:
-#    depends_on:
-#      - rest
-##      - minio
+##    depends_on:
+##      - rest
+###      - minio
 #    volumes:
 #      - $HOME/.aws/credentials:$HOME/.aws/credentials:ro
 ##      - ./warehouse:/home/iceberg/warehouse
 ##      - ./notebooks:/home/iceberg/notebooks/notebooks
-##    environment:
-##      - AWS_ACCESS_KEY_ID=admin
-##      - AWS_SECRET_ACCESS_KEY=password
-##      - AWS_REGION=us-east-1
+#    environment:
+#      AWS_REGION: us-east-2
+#      AWS_PROFILE: mfa # Change this to match your local AWS profile, best to use MFA w/ session tokens.
 #    ports:
 #      - "8888:8888"
 #      - "8080:8080"
