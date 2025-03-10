@@ -1,13 +1,13 @@
 services:
   debezium:
     container_name: debezium
-    image: ghcr.io/memiiso/debezium-server-iceberg:latest
+    image: ghcr.io/memiiso/debezium-server-iceberg:local-03
 #    command: sh -c 'sleep infinity'
 #    entrypoint: sh -c 'sleep infinity'
     networks:
       iceberg:
     depends_on:
-    - rest
+#    - rest
 #    - minio
     - tsdb
 #    - mc
@@ -16,7 +16,7 @@ services:
     - $HOME/.aws/credentials:/root/.aws/credentials:ro
     - $HOME/.aws/config:/root/.aws/config:ro
     environment:
-      AWS_REGION: us-east-1
+      AWS_REGION: us-east-2
       AWS_PROFILE: mfa # Change this to match your local AWS profile, best to use MFA w/ session tokens.
 
   tsdb:
@@ -35,23 +35,23 @@ services:
     ports:
       - "5432:5432"
 
-  rest:
-    container_name: rest
-    image: apache/iceberg-rest-fixture
-    networks:
-      iceberg:
-    ports:
-    - "8181:8181"
-    volumes:
-    - $HOME/.aws/credentials:/home/iceberg/.aws/credentials:ro
-    - $HOME/.aws/config:/home/iceberg/.aws/config:ro
-    environment:
-      AWS_REGION: us-east-1
-      AWS_PROFILE: mfa # Change this to match your local AWS profile, best to use MFA w/ session tokens.
-      CATALOG_WAREHOUSE: s3://dodd-iceberg-basic
-      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
-#    - CATALOG_WAREHOUSE=s3://warehouse/
-#    - CATALOG_S3_ENDPOINT=http://minio:9000
+#  rest:
+#    container_name: rest
+#    image: apache/iceberg-rest-fixture
+#    networks:
+#      iceberg:
+#    ports:
+#    - "8181:8181"
+#    volumes:
+#    - $HOME/.aws/credentials:/home/iceberg/.aws/credentials:ro
+#    - $HOME/.aws/config:/home/iceberg/.aws/config:ro
+#    environment:
+#      AWS_REGION: us-east-1
+#      AWS_PROFILE: mfa # Change this to match your local AWS profile, best to use MFA w/ session tokens.
+#      CATALOG_WAREHOUSE: s3://dodd-iceberg-basic
+#      CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+##    - CATALOG_WAREHOUSE=s3://warehouse/
+##    - CATALOG_S3_ENDPOINT=http://minio:9000
 
 #  minio:
 #    container_name: minio
@@ -96,17 +96,16 @@ services:
 #    build: spark/
 #    networks:
 #      iceberg:
-#    depends_on:
-#      - rest
-##      - minio
+##    depends_on:
+##      - rest
+###      - minio
 #    volumes:
 #      - $HOME/.aws/credentials:$HOME/.aws/credentials:ro
 ##      - ./warehouse:/home/iceberg/warehouse
 ##      - ./notebooks:/home/iceberg/notebooks/notebooks
-##    environment:
-##      - AWS_ACCESS_KEY_ID=admin
-##      - AWS_SECRET_ACCESS_KEY=password
-##      - AWS_REGION=us-east-1
+#    environment:
+#      AWS_REGION: us-east-2
+#      AWS_PROFILE: mfa # Change this to match your local AWS profile, best to use MFA w/ session tokens.
 #    ports:
 #      - "8888:8888"
 #      - "8080:8080"
