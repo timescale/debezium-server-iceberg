@@ -2,7 +2,7 @@ name: Create Release
 
 on:
   push:
-    tags: [ '*.*.*.*' ]
+    tags: [ '*.*.*.*', '*.*.*-*' ]
     branches: [ master ]
 
 env:
@@ -80,7 +80,7 @@ jobs:
           version: ${{ env.RELEASE_NAME }}
         continue-on-error: true
       - name: Publish ${{ env.RELEASE_NAME }} to GitHub Packages
-        run: mvn --batch-mode clean package -Passembly deploy --file pom.xml -Drevision=${{ env.RELEASE_NAME }} -Dmaven.test.skip=true
+        run: mvn --batch-mode clean package -Passembly deploy --file pom.xml -Drevision=${{ env.RELEASE_NAME }} -Dmaven.test.skip=true -X
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
