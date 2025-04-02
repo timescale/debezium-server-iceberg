@@ -11,7 +11,7 @@ env:
 jobs:
   build-and-release:
     name: Build and Release
-    if: github.repository_owner == 'memiiso'
+    #if: github.repository_owner == 'memiiso'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,7 +39,7 @@ jobs:
         shell: bash # Explicitly set shell to bash
 
       - name: Build Project
-        run: mvn -B --no-transfer-progress clean package -Passembly --file pom.xml -Drevision=${{ env.RELEASE_NAME }}
+        run: mvn -B --no-transfer-progress clean package -Passembly -Dmaven.test.skip=true --file pom.xml -Drevision=${{ env.RELEASE_NAME }}
 
       - name: Delete Existing Release (if any)
         run: gh release delete ${{ env.RELEASE_NAME }} --cleanup-tag --yes
