@@ -3,7 +3,7 @@ name: Create Release
 on:
   push:
     tags: [ '*.*.*.*', '*.*.*-*' ]
-    branches: [ master ]
+    branches: [ master, release ]
 
 env:
   SPARK_LOCAL_IP: 127.0.0.1
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
+      packages: read
       actions: write
     steps:
       - name: Checkout Repository
@@ -31,7 +31,7 @@ jobs:
       - name: Determine Release Name
         id: set_release_name
         run: |
-          if [[ "${{ github.ref_name }}" == "master" ]]; then
+          if [[ "${{ github.ref_name }}" == "release" ]]; then
             echo "RELEASE_NAME=latest" >> $GITHUB_ENV
           else
             echo "RELEASE_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
