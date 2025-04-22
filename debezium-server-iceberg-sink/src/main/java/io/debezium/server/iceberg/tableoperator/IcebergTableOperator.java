@@ -156,6 +156,7 @@ public class IcebergTableOperator {
               .collect(Collectors.groupingBy(RecordConverter::schemaConverter));
       LOGGER.debug("Batch got {} records with {} different schema!!", events.size(), eventsGroupedBySchema.keySet().size());
 
+      //CHECK HERE: this is where schema gets extended
       for (Map.Entry<SchemaConverter, List<RecordConverter>> schemaEvents : eventsGroupedBySchema.entrySet()) {
         // extend table schema if new fields found
         applyFieldAddition(icebergTable, schemaEvents.getValue().get(0).icebergSchema());
@@ -203,5 +204,6 @@ public class IcebergTableOperator {
     }
 
     LOGGER.info("Committed {} events to table! {}", events.size(), icebergTable.location());
+    LOGGER.info(" HERE Committed {} events to table! {}", events.size(), icebergTable.location());
   }
 }

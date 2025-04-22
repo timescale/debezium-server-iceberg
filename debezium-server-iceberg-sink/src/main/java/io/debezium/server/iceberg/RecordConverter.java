@@ -132,6 +132,9 @@ public class RecordConverter {
    * @return True if it's a schema change event, false otherwise.
    */
   public boolean isSchemaChangeEvent() {
+    if (value().has("ddl")) {
+      LOGGER.info(" HERE in isSchemaChange event ddl val{} ", value() );
+    }
     return value().has("ddl") && value().has("databaseName") && value().has("tableChanges");
   }
 
@@ -312,6 +315,7 @@ public class RecordConverter {
     final String eexMessage = "Failed to convert timestamp value, field: " + field.name() + " value: " + node + " temporalPrecisionMode: " + temporalPrecisionMode;
     if (node.isNumber()) {
       return switch (temporalPrecisionMode) {
+       // LOGGER.info("convertLocalDate timestamp val {} for fld {} precision is {} HERE", node, field.name(), temporalPrecisionMode);
         case MICROSECONDS -> DateTimeUtil.timestampFromMicros(node.asLong());
         case NANOSECONDS -> DateTimeUtil.timestampFromNanos(node.asLong());
         case CONNECT -> timestampFromMillis(node.asLong());
@@ -334,6 +338,7 @@ public class RecordConverter {
     if (node.isNumber()) {
       // non Timezone
       return switch (temporalPrecisionMode) {
+        //LOGGER.info("convertOffsetDate timestamp val {} for fld {} precision is {} HERE", node, field.name(), temporalPrecisionMode);
         case MICROSECONDS -> DateTimeUtil.timestamptzFromMicros(node.asLong());
         case NANOSECONDS -> timestamptzFromNanos(node.asLong());
         case CONNECT -> timestamptzFromMillis(node.asLong());

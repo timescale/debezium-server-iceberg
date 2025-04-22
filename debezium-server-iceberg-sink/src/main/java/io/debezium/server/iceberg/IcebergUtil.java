@@ -25,6 +25,7 @@ import org.apache.iceberg.exceptions.NoSuchTableException;
 import org.apache.iceberg.io.OutputFileFactory;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 import org.apache.iceberg.types.TypeUtil;
+import org.apache.iceberg.PartitionSpec;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.eclipse.microprofile.config.ConfigValue;
@@ -114,6 +115,8 @@ public class IcebergUtil {
       ((SupportsNamespaces) icebergCatalog).createNamespace(tableIdentifier.namespace());
       LOGGER.warn("Created namespace:'{}'", tableIdentifier.namespace());
     }
+    LOGGER.info("HERE createIcebergTable sch{} table:{} nmspc:{} nm:{}", schema, tableIdentifier, tableIdentifier.namespace(), tableIdentifier.name());
+    
     return icebergCatalog.createTable(tableIdentifier, schema);
   }
 
@@ -128,11 +131,27 @@ public class IcebergUtil {
       LOGGER.warn("Created namespace:'{}'", tableIdentifier.namespace());
     }
 
+    LOGGER.info("HERE createIcebergTable 222222 sch{} table:{} nmspc:{} nm:{}", schema, tableIdentifier, tableIdentifier.namespace(), tableIdentifier.name());
+ // hard code partition spec
+    if (tableIdentifier.name().equals("_public_hypertab") ) {
+      PartitionSpec TABLE_PARTITION = PartitionSpec.builderFor(schema)
+      .day("ts")
+      .build();
+     LOGGER.info("HERE createIcebergTable 3333 for _public_hypertab");
+      return icebergCatalog
+          .buildTable(tableIdentifier, schema)
+          .withPartitionSpec(TABLE_PARTITION)
+          .withSortOrder(IcebergUtil.getIdentifierFieldsAsSortOrder(schema))
+          .create();
+    }
     return icebergCatalog.buildTable(tableIdentifier, schema)
         .withProperty(FORMAT_VERSION, "2")
         .withProperty(DEFAULT_FILE_FORMAT, writeFormat.toLowerCase(Locale.ENGLISH))
         .withSortOrder(IcebergUtil.getIdentifierFieldsAsSortOrder(schema))
         .create();
+     
+
+
   }
 
   private static SortOrder getIdentifierFieldsAsSortOrder(Schema schema) {
