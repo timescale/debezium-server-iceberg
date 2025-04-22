@@ -12,7 +12,7 @@
     <parent>
         <groupId>io.debezium</groupId>
         <artifactId>debezium-server-iceberg</artifactId>
-        <version>${revision}</version>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -112,6 +112,11 @@
                 <dependency>
                     <groupId>io.debezium</groupId>
                     <artifactId>debezium-connector-postgres</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>com.timescale.tigerlake</groupId>
+                    <artifactId>debcustom</artifactId>
+                    <version>1.0-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>io.debezium</groupId>

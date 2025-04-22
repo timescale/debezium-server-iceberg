@@ -66,6 +66,7 @@ public class IcebergTableWriterFactory {
 
     } else {
       // table is partitioned use partitioned append writer
+      LOGGER.info("HERE Part append writer for table:{}", icebergTable);
       return new PartitionedAppendWriter(
           icebergTable.spec(), format, appenderFactory, fileFactory, icebergTable.io(), targetFileSize, icebergTable.schema());
     }
@@ -81,6 +82,7 @@ public class IcebergTableWriterFactory {
           targetFileSize, icebergTable.schema(), identifierFieldIds, config.iceberg().keepDeletes());
     } else {
       // running with upsert mode + partitioned table
+      LOGGER.info("HERE Part DElta writer for table:{}", icebergTable);
       return new PartitionedDeltaWriter(icebergTable.spec(), format, appenderFactory, fileFactory,
           icebergTable.io(),
           targetFileSize, icebergTable.schema(), identifierFieldIds, config.iceberg().keepDeletes());

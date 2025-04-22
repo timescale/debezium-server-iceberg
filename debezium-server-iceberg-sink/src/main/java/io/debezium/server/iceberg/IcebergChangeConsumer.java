@@ -106,6 +106,7 @@ public class IcebergChangeConsumer extends BaseChangeConsumer implements Debeziu
       throws InterruptedException {
     Instant start = Instant.now();
 
+    LOGGER.info(" HERE IcebergChangeConsumer: handleBatch got batch here");
     //group events by destination (per iceberg table)
     Map<String, List<RecordConverter>> result =
         records.stream()
@@ -119,6 +120,7 @@ public class IcebergChangeConsumer extends BaseChangeConsumer implements Debeziu
     // consume list of events for each destination table
     for (Map.Entry<String, List<RecordConverter>> tableEvents : result.entrySet()) {
       Table icebergTable = this.loadIcebergTable(mapDestination(tableEvents.getKey()), tableEvents.getValue().get(0));
+      LOGGER.info("HERE adding event {} to IcebergTable {} tbl={}", tableEvents.getValue(), tableEvents.getKey(), icebergTable );
       icebergTableOperator.addToTable(icebergTable, tableEvents.getValue());
     }
 
@@ -145,6 +147,7 @@ public class IcebergChangeConsumer extends BaseChangeConsumer implements Debeziu
       if (!config.debezium().eventSchemaEnabled()) {
         throw new RuntimeException("Table '" + tableId + "' not found! " + "Set `debezium.format.value.schemas.enable` to true to create tables automatically!");
       }
+      LOGGER.info("HERE loading Iceberg table for {}", tableId);
       try {
         final Schema schema = sampleEvent.icebergSchema();
         // Check if the message is a schema change event (DDL statement).
@@ -152,8 +155,10 @@ public class IcebergChangeConsumer extends BaseChangeConsumer implements Debeziu
         // "schema change topic" https://debezium.io/documentation/reference/3.0/connectors/mysql.html#mysql-schema-change-topic
         if (sampleEvent.isSchemaChangeEvent()) {
           LOGGER.warn("Schema change topic detected. Creating Iceberg schema without identifier fields for append-only mode.");
+          LOGGER.info("HERE Schema change topic detected. Creating Iceberg schema without identifier fields for append-only mode.");
           return IcebergUtil.createIcebergTable(icebergCatalog, tableId, new Schema(schema.columns()), config.iceberg().writeFormat());
         }
+
 
         return IcebergUtil.createIcebergTable(icebergCatalog, tableId, schema, config.iceberg().writeFormat());
       } catch (Exception e) {
@@ -178,16 +183,19 @@ public class IcebergChangeConsumer extends BaseChangeConsumer implements Debeziu
   }
 
   public TableIdentifier mapDestination(String destination) {
+    //our destination  string looks like: dbz.public.hypertab. we have to replace . before creating an Iceberg table
     final String tableName = destination
-        .replaceAll(config.iceberg().destinationRegexp().orElse(""), config.iceberg().destinationRegexpReplace().orElse(""))
-        .replace(".", "_");
+        .replace(".", "_")
+        .replaceAll("dbz_", "");
+        //.replaceAll(config.iceberg().destinationRegexp().orElse(""), config.iceberg().destinationRegexpReplace().orElse(""))
 
     if (config.iceberg().destinationUppercaseTableNames()) {
       return TableIdentifier.of(Namespace.of(config.iceberg().namespace()), (config.iceberg().tablePrefix().orElse("") + tableName).toUpperCase());
     } else if (config.iceberg().destinationLowercaseTableNames()) {
       return TableIdentifier.of(Namespace.of(config.iceberg().namespace()), (config.iceberg().tablePrefix().orElse("") + tableName).toLowerCase());
     } else {
-      return TableIdentifier.of(Namespace.of(config.iceberg().namespace()), config.iceberg().tablePrefix().orElse("") + tableName);
+      return TableIdentifier.of(Namespace.of(config.iceberg().namespace()), tableName);
+      //return TableIdentifier.of(Namespace.of(config.iceberg().namespace()), config.iceberg().tablePrefix().orElse("") + tableName);
     }
   }
 }

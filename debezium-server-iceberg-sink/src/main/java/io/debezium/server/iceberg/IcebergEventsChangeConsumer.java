@@ -135,6 +135,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
     }
     // load table
     eventTable = icebergCatalog.loadTable(tableIdentifier);
+    LOGGER.info("loaded table {} from Iceberg catalog", tableIdentifier);
 
     batchSizeWait = IcebergUtil.selectInstance(batchSizeWaitInstances, config.batch().batchSizeWaitName());
     batchSizeWait.initizalize();
@@ -146,7 +147,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
     keySerde.configure(Collections.emptyMap(), true);
     keyDeserializer = keySerde.deserializer();
 
-    LOGGER.info("Using {}", batchSizeWait.getClass().getName());
+    LOGGER.info("Using batchsizewait class {}", batchSizeWait.getClass().getName());
   }
 
   public GenericRecord getIcebergRecord(ChangeEvent<Object, Object> record, OffsetDateTime batchTime) {
@@ -166,7 +167,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
       rec.setField("event_value_payload", mapper.writeValueAsString(valuePayload));
       rec.setField("event_sink_epoch_ms", batchTime.toEpochSecond());
       rec.setField("event_sink_timestamptz", batchTime);
-
+      LOGGER.info("HERE getIcebergRecord event_dest={}", record.destination() ); 
       return rec;
     } catch (IOException e) {
       throw new DebeziumException(e);
@@ -179,6 +180,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
     Instant start = Instant.now();
 
     OffsetDateTime batchTime = OffsetDateTime.now(ZoneOffset.UTC);
+    LOGGER.info("HERE IcebergEventChangeConsumer:handleBatch ");
     ArrayList<Record> icebergRecords = records.stream()
         .map(e -> getIcebergRecord(e, batchTime))
         .collect(Collectors.toCollection(ArrayList::new));
@@ -199,6 +201,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
     FileFormat format = IcebergUtil.getTableFileFormat(eventTable);
     GenericAppenderFactory appenderFactory = IcebergUtil.getTableAppender(eventTable);
     int partitionId = Integer.parseInt(dtFormater.format(Instant.now()));
+    LOGGER.info("iceberg commit batch eventTbl { } partId {}", eventTable, partitionId);
     OutputFileFactory fileFactory = OutputFileFactory.builderFor(eventTable, partitionId, 1L)
         .defaultSpec(eventTable.spec()).format(format).build();
 
@@ -222,6 +225,7 @@ public class IcebergEventsChangeConsumer extends BaseChangeConsumer implements D
     }
 
     LOGGER.info("Committed {} events to table! {}", icebergRecords.size(), eventTable.location());
+    LOGGER.info("HERE Committed {} events to table! {}", icebergRecords.size(), eventTable.location());
   }
 
 }
